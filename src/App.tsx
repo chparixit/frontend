@@ -1,8 +1,9 @@
 import { useState } from "react";
-import { LoginPage } from "./pages/Login/login";
-import { RegisterPage } from "./pages/register/register";
+import { LoginPage } from "./pages/login";
+import { RegisterPage } from "./pages/register";
+import Dashboard from "./pages/dashboard";
 
-type Page = "login" | "register";
+type Page = "login" | "register" | "dashboard";
 
 // ─── Logo Icon ────────────────────────────────────────────────────────────────
 
@@ -98,13 +99,36 @@ const Footer = () => (
 export default function App() {
   const [page, setPage] = useState<Page>("login");
 
+  const handleLoginSuccess = () => {
+    setPage("dashboard");
+  };
+
   return (
-    <div style={{ fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif", minHeight: "100vh", background: "#F9FAFB" }}>
-      <Navbar onLogin={() => setPage("login")} onRegister={() => setPage("register")} />
-      {page === "login"
-        ? <LoginPage onGoRegister={() => setPage("register")} />
-        : <RegisterPage onGoLogin={() => setPage("login")} />
-      }
+    <div
+      style={{
+        fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
+        minHeight: "100vh",
+        background: "#F9FAFB",
+      }}
+    >
+      <Navbar
+        onLogin={() => setPage("login")}
+        onRegister={() => setPage("register")}
+      />
+
+      {page === "login" && (
+        <LoginPage
+          onGoRegister={() => setPage("register")}
+          onSuccess={handleLoginSuccess}   // 👈 add this
+        />
+      )}
+
+      {page === "register" && (
+        <RegisterPage onGoLogin={() => setPage("login")} />
+      )}
+
+      {page === "dashboard" && <Dashboard />}
+
       <Footer />
     </div>
   );
