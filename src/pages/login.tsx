@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { loginApi } from "../api/authApi";
 
 // ─── Icons ────────────────────────────────────────────────────────────────────
 
@@ -113,9 +114,10 @@ const ImagePanel = () => (
 
 interface LoginPageProps {
   onGoRegister: () => void;
+  onSuccess: () => void;
 }
 
-export const LoginPage = ({ onGoRegister }: LoginPageProps) => {
+export const LoginPage = ({ onGoRegister, onSuccess }: LoginPageProps) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPass, setShowPass] = useState(false);
@@ -178,6 +180,7 @@ export const LoginPage = ({ onGoRegister }: LoginPageProps) => {
           {/* Sign In button */}
           {/* Login button */}
 <button
+  type="button"
   style={{
     width: "100%",
     background: "#2563EB",
@@ -190,11 +193,27 @@ export const LoginPage = ({ onGoRegister }: LoginPageProps) => {
     cursor: "pointer",
     fontFamily: "inherit",
   }}
-  onClick={() => {
-    if (email && password) {
-      alert("Login Successfully ✅");
-    } else {
-      alert("Please enter email and password");
+  onClick={async (e) => {
+    e.preventDefault();
+
+    if (!email || !password) {
+      alert("Please enter your email and password.");
+      return;
+    }
+
+    try {
+      const res = await loginApi({ email, password });
+
+      localStorage.setItem("token", res.data.token);
+      onSuccess();
+    } catch (error: any) {
+      if (error.response) {
+        alert(error.response.data?.message ?? "Login failed");
+      } else if (error.code === "ECONNABORTED") {
+        alert("Server is not responding. Make sure the backend is running on port 5000, then try again.");
+      } else {
+        alert(error.message ?? "Login failed");
+      }
     }
   }}
   onMouseOver={(e) => (e.currentTarget.style.background = "#1D4ED8")}

@@ -1,4 +1,6 @@
 import { useState } from "react";
+ import axios from "axios";
+ import React from "react";
 
 // ─── Icons ─────────────────────────────────────────────────────────────
 
@@ -77,22 +79,37 @@ export const RegisterPage = ({ onGoLogin }: RegisterPageProps) => {
 
   // ─── Create Account ────────────────────────────────────────────────
 
-  const handleCreateAccount = () => {
+ 
+
+const handleCreateAccount = async () => {
+  try {
     const user = {
       name,
       email,
-      phone,
       password,
     };
 
-    // save to localStorage
-    localStorage.setItem("rentalBuddyUser", JSON.stringify(user));
+    const res = await axios.post(
+      "http://localhost:5000/api/auth/register",
+      user
+    );
 
-    alert("Account Created Successfully!");
+    alert(res.data.message);
 
-    // redirect to login
     onGoLogin();
-  };
+  } catch (error: any) {
+  console.log("FULL ERROR:", error);
+
+  if (error.response) {
+    console.log("STATUS:", error.response.status);
+    console.log("DATA:", error.response.data);
+    alert(JSON.stringify(error.response.data));
+  } else {
+    console.log("MESSAGE:", error.message);
+    alert(error.message);
+  }
+}
+};
 
   // ─── UI ────────────────────────────────────────────────────────────
 
